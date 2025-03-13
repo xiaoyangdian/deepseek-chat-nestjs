@@ -22,11 +22,13 @@ export async function POST(req) {
         // 添加用户消息
         messages.push({ role: 'user', content: message })
 
+        let postmsg = messages.filter(m1 => m1.role != 'reason')
+
         // 流式响应
         const stream = await openai.chat.completions.create({
-            messages,
+            messages: postmsg,
             model: "deepseek-reasoner",
-            max_tokens: 1000,
+            max_tokens: 2000,
             stream: true,
         })
 
@@ -35,17 +37,25 @@ export async function POST(req) {
         const readableStream = new ReadableStream({
             async start(controller) {
                 let assistantReply = ''
+                let reasonreply = '';
                 for await (const chunk of stream) {
                     const content = chunk.choices[0]?.delta?.content || ''
+                    const reasoning_content = chunk.choices[0]?.delta?.reasoning_content || ''
+                    if (reasoning_content) {
+                        reasonreply += reasoning_content
+                        controller.enqueue(encoder.encode(`reasoning_content__${reasoning_content},`))
+                    }
                     if (content) {
-                        console.log(content);
+                        // console.log(content);
                         assistantReply += content
-                        controller.enqueue(encoder.encode(`${JSON.stringify({ content })},`))
+                        // controller.enqueue(encoder.encode(`{"content": "${JSON.stringify({ content })}"}`))
+                        controller.enqueue(encoder.encode(`content__${content},`))
                     }
 
                 }
 
                 // 保存完整对话
+                messages.push({ role: 'reason', content: reasonreply })
                 messages.push({ role: 'assistant', content: assistantReply })
                 const finalChatId = chatId || store.createChat()
                 store.saveChat(finalChatId, messages)
@@ -64,6 +74,7 @@ export async function POST(req) {
         })
 
     } catch (error) {
+        console.log('请求error', error);
         return NextResponse.json(
             { error: error.message },
             { status: 500 }

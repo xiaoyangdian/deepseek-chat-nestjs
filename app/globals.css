@@ -1,7 +1,7 @@
 .container {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 2rem;
+  max-width: 90%;
+  padding: 20px;
+  font-size: 16px;
 }
 
 .messages {
@@ -10,6 +10,28 @@
   border: 1px solid #ddd;
   padding: 1rem;
   margin-bottom: 1rem;
+}
+.message {
+  position: relative;
+  padding-right: 60px; /* 为按钮预留空间 */
+}
+
+.toggle-button {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  padding: 4px 10px;
+  background: #0070f3;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  z-index: 1;
+}
+
+.toggle-button:hover {
+  background: #0051a2;
 }
 
 .message {
@@ -26,6 +48,10 @@
 
 .message.assistant {
   background: #f5f5f5;
+  margin-right: auto;
+}
+.message.reason {
+  background: #fafafa;
   margin-right: auto;
 }
 
