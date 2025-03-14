@@ -1,8 +1,26 @@
 .container {
   max-width: 90%;
   padding: 20px;
+  padding-top: 0;
   font-size: 16px;
 }
+/* globals.css 新增样式 */
+.mybutton {
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
+.toggle-all-button {
+  background: #4caf50;
+  padding: 8px 16px;
+  font-size: 14px;
+}
+
+.toggle-all-button:hover {
+  background: #45a049;
+}
+
+/* 保持其他样式不变 */
 
 .messages {
   height: 70vh;
@@ -15,7 +33,16 @@
   position: relative;
   padding-right: 60px; /* 为按钮预留空间 */
 }
-
+.collapsed-preview {
+  flex-grow: 1;
+  margin-left: 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: calc(100% - 90px);
+  color: #666;
+  font-size: 0.9em;
+}
 .toggle-button {
   position: absolute;
   right: 10px;

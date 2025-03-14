@@ -13,8 +13,16 @@ export default function ChatPage({ params }) {
       const res = await fetch(`/api/chats?id=${id}`);
       const data = await res.json();
       setMessages(data || []);
+      // 初始化默认收缩状态
+      const initialCollapsed = {};
+      data.forEach((msg, index) => {
+        if (msg.role !== "user") {
+          initialCollapsed[index] = true;
+        }
+      });
+      setCollapsedMessages(initialCollapsed);
     };
-    if (id) loadHistory();
+    if (id) loadHistory();  
   }, [id]);
 
   const handleSubmit = async (e) => {
@@ -120,6 +128,21 @@ export default function ChatPage({ params }) {
 
   const [collapsedMessages, setCollapsedMessages] = useState({});
 
+  // 新增：全局切换按钮处理函数
+  const toggleAllNonUser = () => {
+    const newCollapsed = {};
+    messages.forEach((msg, i) => {
+      if (msg.role !== "user") {
+        newCollapsed[i] = !shouldCollapseAll;
+      }
+    });
+    setCollapsedMessages(newCollapsed);
+    setShouldCollapseAll((prev) => !prev);
+  };
+
+  // 新增：用于跟踪全局状态的state
+  const [shouldCollapseAll, setShouldCollapseAll] = useState(true);
+
   return (
     <div className="container">
       <div className="messages">
@@ -138,6 +161,11 @@ export default function ChatPage({ params }) {
                 {msg.content.replace(/\n/g, "  \n")}
               </ReactMarkdown>
             )}
+            {collapsedMessages[i] && (
+              <span className="collapsed-preview">
+                {`${msg.content.substring(0, 50).replace(/\n/g, " ")}...`}
+              </span>
+            )}
           </div>
         ))}
       </div>
@@ -150,7 +178,17 @@ export default function ChatPage({ params }) {
           onChange={(e) => setInput(e.target.value)}
           placeholder="输入消息..."
         />
-        <button type="submit">发送</button>
+        <div style={{ display: "flex", "justify-content": "flex-end" }}>
+          <button className="mybutton" type="submit">
+            发送
+          </button>
+          <button
+            className="mybutton toggle-all-button"
+            onClick={toggleAllNonUser}
+          >
+            {shouldCollapseAll ? "展开所有非用户消息" : "收缩所有非用户消息"}
+          </button>
+        </div>
       </form>
     </div>
   );
